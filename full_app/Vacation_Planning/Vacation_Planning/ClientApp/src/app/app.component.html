@@ -1,0 +1,167 @@
+﻿<!--главная страница-->
+<h1 style="padding-left:5%; padding-right:70%; padding-top:1px">Список сотрудников</h1>
+<div style="padding-left:5%; padding-right:70%;">
+    <input type="button" value="Добавить сотрудника" class="btn btn-default" (click)="add()" />
+    <input type="button" value="Сгенерировать отпуска" class="btn btn-default btn-primary" (click)="generate()" />
+</div>
+<div style="padding-left:5%; padding-right:5%;">
+    <table *ngIf="tableMode; else create" class="table table-striped">
+        <thead>
+            <tr>
+                <td>Фамилия</td>
+                <td>Имя</td>
+                <td>Отчество</td>
+                <td>Дата рождения</td>
+                <td>Пол</td>
+                <td>Должность</td>
+                <td>Отпуск</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let e of employees">
+                <ng-template [ngIf]="employee?.id != e.id" [ngIfElse]="edit">
+                    <td>{{e?.surname}}</td>
+                    <td>{{e?.name}}</td>
+                    <td>{{e?.secondName}}</td>
+                    <td>{{e?.birthDate.slice(0, 10)}}</td>
+                    <td>{{e?.gender == 1 ? "Мужской" : e?.gender == 2 ? "Женский" : "Не задан"}}</td>
+                    <td>{{e?.position == 1 ? "Директор" : e?.position == 2 ? "Зам. дир." : e?.position == 3 ? "Начальник IT" : e?.position == 4 ? "Зам. нач. IT" : e?.position == 5 ? "Глав. бух." : e?.position == 6 ? "Бухгалтер" : e?.position == 7 ? "C# разраб." : e?.position == 8 ? "Java разраб." : e?.position == 9 ? "C++ разраб." : e?.position == 10 ? "Дизайнер" : e?.position == 11 ? "HR" : e?.position == 12 ? "Сис. админ." : "Не задана"}}</td>
+                    <td>{{e?.vacationDate}}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" (click)="editEmployee(e)">Изменить</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" (click)="delete(e)">Удалить</button>
+                    </td>
+                </ng-template>
+            </tr>
+        </tbody>
+    </table>
+
+    <!--шаблон для редактирования-->
+    <ng-template #edit>
+        <td>
+            <input type="text" name="surname" [(ngModel)]="employee.surname" class="form-control" #surname="ngModel" required pattern="[А-Яа-яЁёA-Za-z]+$" />
+            <div [hidden]="surname.valid || surname.untouched" class="alert alert-danger">
+                Некорректная фамилия
+            </div>
+        </td>
+        <td>
+            <input type="text" name="name" [(ngModel)]="employee.name" class="form-control" #name="ngModel" required pattern="[А-Яа-яЁёA-Za-z]+$" />
+            <div [hidden]="name.valid || name.untouched" class="alert alert-danger">
+                Некорректное имя
+            </div>
+        </td>
+        <td>
+            <input type="text" [(ngModel)]="employee.secondName" class="form-control" />
+        </td>
+        <td>
+            <input type="date" name="birthdate" [(ngModel)]="employee.birthDate" class="form-control" #birthdate="ngModel" required />
+            <div [hidden]="birthdate.valid || birthdate.untouched" class="alert alert-danger">
+                Не указана дата рождения
+            </div>
+        </td>
+        <td>
+            <select name="gender" [(ngModel)]="employee.gender" class="form-control" #gender="ngModel" required>
+                <option [ngValue]=1>Мужской</option>
+                <option [ngValue]=2>Женский</option>
+            </select>
+            <div [hidden]="gender.valid || gender.untouched" class="alert alert-danger">
+                Не выбран пол
+            </div>
+        </td>
+        <td>
+            <select name="position" [(ngModel)]="employee.position" class="form-control" #position="ngModel" required>
+                <option [ngValue]=1>Директор</option>
+                <option [ngValue]=2>Зам. дир.</option>
+                <option [ngValue]=3>Начальник IT</option>
+                <option [ngValue]=4>Зам. нач. IT</option>
+                <option [ngValue]=5>Глав. бух.</option>
+                <option [ngValue]=6>Бухгалтер</option>
+                <option [ngValue]=7>C# разраб.</option>
+                <option [ngValue]=8>Java разраб.</option>
+                <option [ngValue]=9>C++ разраб.</option>
+                <option [ngValue]=10>Дизайнер</option>
+                <option [ngValue]=11>HR</option>
+                <option [ngValue]=12>Сис. админ.</option>
+            </select>
+            <div [hidden]="position.valid || position.untouched" class="alert alert-danger">
+                Не выбрана должность
+            </div>
+        </td>
+        <td>
+            <input type="text" disabled [(ngModel)]="employee.vacationDate" class="form-control" />
+        </td>
+        <td>
+            <input type="button" [disabled]="name.invalid || surname.invalid || birthdate.invalid || gender.invalid || position.invalid" value="Сохранить" (click)="save()" class="btn btn-sm btn-success" />
+        </td>
+        <td>
+            <input type="button" value="Отмена" (click)="cancel()" class="btn btn-sm btn-warning" />
+        </td>
+    </ng-template>
+
+    <!--шаблон для добавления-->
+    <ng-template #create>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Фамилия</label>
+            <input type="text" name="surname" [(ngModel)]="employee.surname" class="form-control" #surname="ngModel" required pattern="[А-Яа-яЁёA-Za-z]+$" />
+            <div [hidden]="surname.valid || surname.untouched" class="alert alert-danger">
+                Некорректная фамилия
+            </div>
+        </div>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Имя</label>
+            <input type="text" name="name" [(ngModel)]="employee.name" class="form-control" #name="ngModel" required pattern="[А-Яа-яЁёA-Za-z]+$" />
+            <div [hidden]="name.valid || name.untouched" class="alert alert-danger">
+                Некорректное имя
+            </div>
+        </div>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Отчество</label>
+            <input type="text" [(ngModel)]="employee.secondName" class="form-control" />
+        </div>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Дата рождения</label>
+            <input type="date" name="birthdate" [(ngModel)]="employee.birthDate" class="form-control" #birthdate="ngModel" required />
+            <div [hidden]="birthdate.valid || birthdate.untouched" class="alert alert-danger">
+                Не указана дата рождения
+            </div>
+        </div>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Пол</label>
+            <select name="gender" [(ngModel)]="employee.gender" class="form-control" #gender="ngModel" required>
+                <option [ngValue]=1>Мужской</option>
+                <option [ngValue]=2>Женский</option>
+            </select>
+            <div [hidden]="gender.valid || gender.untouched" class="alert alert-danger">
+                Не выбран пол
+            </div>
+        </div>
+        <div style="padding-left:5%; padding-right:70%;" class="form-group">
+            <label>Должность</label>
+            <select name="position" [(ngModel)]="employee.position" class="form-control" #position="ngModel" required>
+                <option [ngValue]=1>Директор</option>
+                <option [ngValue]=2>Зам. дир.</option>
+                <option [ngValue]=3>Начальник IT</option>
+                <option [ngValue]=4>Зам. нач. IT</option>
+                <option [ngValue]=5>Глав. бух.</option>
+                <option [ngValue]=6>Бухгалтер</option>
+                <option [ngValue]=7>C# разраб.</option>
+                <option [ngValue]=8>Java разраб.</option>
+                <option [ngValue]=9>C++ разраб.</option>
+                <option [ngValue]=10>Дизайнер</option>
+                <option [ngValue]=11>HR</option>
+                <option [ngValue]=12>Сис. админ.</option>
+            </select>
+            <div [hidden]="position.valid || position.untouched" class="alert alert-danger">
+                Не выбрана должность
+            </div>
+        </div>
+        <div style="padding-left:5%; padding-right:70%;">
+            <input type="button" [disabled]="name.invalid || surname.invalid || birthdate.invalid || gender.invalid || position.invalid" value="Сохранить" (click)="save()" class="btn btn-success" />
+            <input type="button" value="Отмена" (click)="cancel()" class="btn btn-warning" />
+        </div>
+    </ng-template>
+</div>
